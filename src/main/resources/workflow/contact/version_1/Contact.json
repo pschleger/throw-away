@@ -1,0 +1,77 @@
+{
+  "version": "1.0",
+  "name": "Contact",
+  "desc": "Contact lifecycle workflow for address book application",
+  "initialState": "initial",
+  "active": true,
+  "states": {
+    "initial": {
+      "transitions": [
+        {
+          "name": "create_contact",
+          "next": "active",
+          "manual": false
+        }
+      ]
+    },
+    "active": {
+      "transitions": [
+        {
+          "name": "update_contact",
+          "next": "active",
+          "manual": true,
+          "processors": [
+            {
+              "name": "UpdateContactProcessor",
+              "executionMode": "ASYNC_NEW_TX",
+              "config": {
+                "attachEntity": true,
+                "calculationNodesTags": "cyoda_application",
+                "responseTimeoutMs": 3000,
+                "retryPolicy": "FIXED"
+              }
+            }
+          ]
+        },
+        {
+          "name": "archive_contact",
+          "next": "archived",
+          "manual": true,
+          "processors": [
+            {
+              "name": "ArchiveContactProcessor",
+              "executionMode": "ASYNC_NEW_TX",
+              "config": {
+                "attachEntity": true,
+                "calculationNodesTags": "cyoda_application",
+                "responseTimeoutMs": 3000,
+                "retryPolicy": "FIXED"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "archived": {
+      "transitions": [
+        {
+          "name": "reactivate_contact",
+          "next": "active",
+          "manual": true,
+          "processors": [
+            {
+              "name": "ReactivateContactProcessor",
+              "executionMode": "ASYNC_NEW_TX",
+              "config": {
+                "attachEntity": true,
+                "calculationNodesTags": "cyoda_application",
+                "responseTimeoutMs": 3000,
+                "retryPolicy": "FIXED"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
